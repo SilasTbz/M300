@@ -11,7 +11,7 @@ config.vm.provider "virtualbox" do |vb|
 end
 config.vm.provision "shell", inline: <<-SHELL
   sudo su - &&
-  apt-get-get update -y &&
+  apt-get update -y &&
   apt-get upgrade -y && 
   apt-get autoremove -y &&
   apt-get install docker docker-compose -y &&
