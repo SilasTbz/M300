@@ -214,7 +214,7 @@ Als erstes sollte ein simpler Verbindungstest mit `ping` durchgeführt werden.
 Wie im Bild ersichtlich, war dieser Test erfolgreich.
 
 Oder man könnte direkt das [Portainer WebGUI](https://192.169.4.20:9009) aufrufen:
-![Portainer](images/Uebersicht.png)
+![Portainer](images/Portainer_webGui.png)
 
 Auch der Zugriff aufs WebGUI funktioniert. Somit können wir abschliessend sagen, dass unser System funktioniert.
 
