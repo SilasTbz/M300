@@ -19,6 +19,13 @@ Aus dem englischen Übersetzt, Quelle: [Containers: Portainer Overview](https://
   - [Verwendete Software](#verwendete-software)
   - [VM-Spezifikationen](#vm-spezifikationen)
 - **[Sourcecode](#Sourcecode)**
+  - [vagrantfile](#vagrantfile)
+  - [Basis Konfiguration](#basis-konfiguration)
+  - [Konfigurationen durch die Shell](#konfigurationen-durch-die-shell)
+    - [Initial Tasks](#initial-tasks)
+    - [Firewall](#firewall)
+    - [Portainer Docker-Container](#portainer-docker-container)
+    - [Abschluss](#abschluss)
 - **[Fazit](#Fazit)**
 - **[Testing](#Testing)**
 - **[Quellen](#Quellen)**
