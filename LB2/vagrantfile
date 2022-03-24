@@ -1,38 +1,38 @@
 Vagrant.configure("2") do |config|
   config.vm.box = "ubuntu/focal64"
 config.vm.hostname = "apache"
-config.vm.network "private_network", ip: "192.168.50.4"
+config.vm.network "private_network", ip: "192.169.4.20"
 config.vm.provider "virtualbox" do |vb|
   vb.name = "Apache in Docker"
-  vb.customize ["modifyvm", :id, "--cpus", "4"]
-  vb.customize ["modifyvm", :id, "--memory", "4000"]
+  vb.customize ["modifyvm", :id, "--cpus", "5"]
+  vb.customize ["modifyvm", :id, "--memory", "5000"]
   vb.customize ["modifyvm", :id, "--usb", "off"]
   vb.customize ["modifyvm", :id, "--usbehci", "off"]
 end
 config.vm.provision "shell", inline: <<-SHELL
-  sudo apt update -y
-  sudo apt upgrade -y
-  sudo apt autoremove -y
-  sudo apt install docker docker-compose -y
+  sudo su - &&
+  apt-get-get update -y &&
+  apt-get upgrade -y && 
+  apt-get autoremove -y &&
+  apt-get install docker docker-compose -y &&
 
-  sudo systemctl enable docker
-  sudo systemctl start docker
+  systemctl enable docker &&
+  systemctl start docker &&
   
+  apt-get install ufw -y &&
+  apt-get install openssh-server -y &&
+  ufw enable &&
+  ufw allow 9009 &&
+  ufw allow 22 &&
   
-  sudo apt install ufw -y
-  sudo apt install net-tools -y    
-  sudo ufw enable
-  sudo ufw allow 9443
-  sudo ufw allow 22
-  
-  sudo docker volume create portainer_data
-  sudo docker run -d -p 8000:8000 -p 9443:9443 --name portainer \
+  docker volume create portainer_volume &&
+  docker run -d -p 8008:8000 -p 9009:9443 --name portainer_container \
   --restart=always \
   -v /var/run/docker.sock:/var/run/docker.sock \
-  -v portainer_data:/data \
-  portainer/portainer-ce:2.9.3
+  -v portainer_volume:/data \
+  portainer/portainer-ce:2.9.3 &&
 
- sudo apt autoremove -y
- sudo apt autoclean -y
+  apt-get autoremove -y &&
+  apt-get autoclean -y
 SHELL
 end
