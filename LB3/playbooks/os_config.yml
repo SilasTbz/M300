@@ -1,9 +1,12 @@
 ---
 # Hosts-datei anpassen: https://www.middlewareinventory.com/blog/ansible-update-etc-hosts-file-across-all-hosts/
 # SSH-Key generieren und verteilen: https://www.middlewareinventory.com/blog/ansible-ssh-key-exchange/
+# Disabling Swap: https://germaniumhq.com/2019/02/14/2019-02-14-Disabling-Swap-for-Kubernetes-in-an-Ansible-Playbook/
 - name: "Prepare/configure CentOs for Kubernetes"
   hosts: all
   remote_user: opsroot
+  become: true
+  become_user: root
   gather_facts: true
 
   tasks:
@@ -29,8 +32,6 @@
 
   - name: Update the /etc/hosts file with node name
     tags: etchostsupdate
-    become: true
-    become_user: root
     lineinfile:
       path: "/etc/hosts"
       regexp: ".*\t{{ hostvars[item]['ansible_hostname']}}\t{{ hostvars[item]['ansible_hostname']}}"
@@ -41,3 +42,79 @@
     when: ansible_hostname != "{{ item }}" or ansible_hostname == "{{ item }}"
     with_items: "{{groups['all']}}"
 
+  - name: Disabling SELinux state
+    selinux:
+      state: disabled
+
+  - name: Disable SWAP since kubernetes can't work with swap enabled (1/2)
+    shell: |
+      swapoff -a
+    #when: kubernetes_installed is changed
+
+  - name: Disable SWAP in fstab since kubernetes can't work with swap enabled (2/2)
+    replace:
+      path: /etc/fstab
+      regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
+      replace: '# \1'
+    #when: kubernetes_installed is changed
+
+  - name: Stop and disable firewalld
+    shell: |
+      systemctl stop firewalld
+      systemctl disable firewalld
+
+  #- name: Stop and disable firewalld.
+  #  service:
+  #    name: firewalld
+  #    state: stopped
+  #    enabled: False
+
+  - name: br_netfilter kernel module aktivieren
+    shell: |
+      modprobe br_netfilter
+      echo '1' > /proc/sys/net/bridge/bridge-nf-call-iptables
+
+  - name: install docker-ce dependencies
+    dnf:
+      name:
+        - yum-utils
+        - device-mapper-persistent-data
+        - lvm2
+      state: latest
+
+  - name: add docker dnf repository
+    shell: |
+      dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+    
+  - name: install containerd.io
+    shell: |
+      dnf install -y --allowerasing https://download.docker.com/linux/centos/8/x86_64/stable/Packages/containerd.io-1.4.4-3.1.el8.x86_64.rpm
+
+  - name: install docker-ce
+    dnf:
+      name:
+        - docker-ce
+      state: latest
+
+  - name: start docker
+    ansible.builtin.systemd:
+      name: docker
+      state: started
+
+  - name: set systemd as cgroup driver
+    ansible.builtin.lineinfile:
+      path: /etc/docker/daemon.json
+      line: "{{ item }}"
+      create: yes 
+    with_items: 
+      - "{"
+      - "  \"exec-opts\": [\"native.cgroupdriver=systemd\"]"
+      - "}"
+
+  - name: restart docker
+    ansible.builtin.systemd:
+      name: docker
+      #daemon_reload: yes
+      state: restarted
+
+  
