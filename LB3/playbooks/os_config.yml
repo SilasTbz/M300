@@ -15,12 +15,14 @@
       ssh-keygen -q -b 2048 -t rsa -N "" -C "creating SSH" -f ~/.ssh/id_rsa
       creates="~/.ssh/id_rsa"
 
+  # (!) WAHRSCHEINLICH FEHLERHAFT NOCHMAL PRÜFEN (!)
   - name: Fetch the keyfile from the node to master
     fetch: 
       src: "~/.ssh/id_rsa.pub"
       dest: "buffer/{{ansible_hostname}}-id_rsa.pub"
       flat: yes
 
+  # (!) WAHRSCHEINLICH FEHLERHAFT NOCHMAL PRÜFEN (!)
   - name: Copy the key add to authorized_keys using Ansible module
     authorized_key:
       user: opsroot
@@ -30,6 +32,7 @@
     with_items: 
       - "{{ groups['all'] }}"   
 
+  # (!) WAHRSCHEINLICH FEHLERHAFT NOCHMAL PRÜFEN (!)
   - name: Update the /etc/hosts file with node name
     tags: etchostsupdate
     lineinfile:
@@ -117,4 +120,28 @@
       #daemon_reload: yes
       state: restarted
 
-  
+  - name: add Kubernetes repository
+    shell: |
+      cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+      [kubernetes]
+      name=Kubernetes
+      baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+      enabled=1
+      gpgcheck=1
+      repo_gpgcheck=1
+      gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+      EOF
+
+  - name: install Kubernetes
+    dnf:
+      name:
+        - kubeadm 
+        - kubelet 
+        - kubectl 
+        - iproute-tc-5.9.0-4.el8.x86_64
+      state: latest
+
+  - name: reboot system
+    shell: |
+      sync
+      reboot
