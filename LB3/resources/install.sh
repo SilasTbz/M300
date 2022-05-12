@@ -1,7 +1,8 @@
 #!/bin/bash
 
 #pfad zum ordner "LB3" aus dem geklonten repository
-CLONEPATH=""
+CLONEPATH="/root/M300_repo"
+MASTERNODE_NAME="master-node"
 
 printf "(*) check if user is 'root'\n"
 if (( $EUID != 0 )); then
@@ -12,10 +13,15 @@ fi
 
 if (( $EUID == 0 )); then
     printf "(+) user IS now 'root' \n"
+    printf "(*) updating system \n"
+    apt update -y && apt full-upgrade -y
+    printf "(*) installing git \n"
+    apt install git -y
+    printf "(*) cloning repo \n"
+    git clone https://github.com/slowloris-coding/M300.git ${CLONEPATH}
     printf "(*) create folder /root/kube-cluster \n"
     mkdir ~/kube-cluster
-    cp ${CLONEPATH}/inventory/hosts ~/kube-cluster/hosts
-
+    cp ${CLONEPATH}/LB3/inventories/hosts ~/kube-cluster/hosts
 else
     printf "(!) user IS NOT 'root' --> exit skript without doing anything \n"
 fi
