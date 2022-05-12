@@ -4,6 +4,18 @@
 CLONEPATH="/root/M300_repo"
 MASTERNODE_NAME="master-node"
 
+function write_log {
+    LOGTYPE=$1
+    LOGTEXT=$2
+    COLORNUM=0
+
+    case $LOGTYPE in
+        process)
+            $COLORNUM
+            ;;
+    esac
+}
+
 printf "(*) check if user is 'root'\n"
 if (( $EUID != 0 )); then
     printf "(?) user is NOT 'root' !\n"
@@ -21,6 +33,7 @@ if (( $EUID == 0 )); then
     git clone https://github.com/slowloris-coding/M300.git ${CLONEPATH}
     printf "(*) create folder /root/kube-cluster \n"
     mkdir ~/kube-cluster
+
     cp ${CLONEPATH}/LB3/inventories/hosts ~/kube-cluster/hosts
 else
     printf "(!) user IS NOT 'root' --> exit skript without doing anything \n"
