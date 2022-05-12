@@ -12,16 +12,16 @@ function print_log {
 
     case $LOGTYPE in
         process)
-            printf "\033[34m(*) ${LOGTEXT}\033[0m \n"
+            printf "\033[34m [*] ${LOGTEXT}\033[0m \n"
             ;;
         info)
-            printf "\033[36m(?) ${LOGTEXT}\033[0m \n"
+            printf "\033[36m [?] ${LOGTEXT}\033[0m \n"
             ;;
         success)
-            printf "\033[32m(+) ${LOGTEXT}\033[0m \n"
+            printf "\033[32m [+] ${LOGTEXT}\033[0m \n"
             ;;
         error)
-            printf "\033[31m(!) ${LOGTEXT}\033[0m \n"
+            printf "\033[31m [-] ${LOGTEXT}\033[0m \n"
             ;;
     esac
 }
