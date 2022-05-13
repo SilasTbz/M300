@@ -1,5 +1,12 @@
 #!/bin/bash
 
+printf "\033[31m####################################################################\n"
+printf "# DIESES SCRIPT IST NICHT ZUM AUSFÜHREN GEDACHT ####################\n"
+printf "# LEDIGLICH UM DIE COMMANDS AUFZEIGEN DIE AUSGEFÜHRT WERDEN MÜSSEN #\n"
+printf "####################################################################\033[0m\n"
+
+
+
 #pfad zum ordner "LB3" aus dem geklonten repository
 CLONEPATH="/root/M300_repo"
 MASTERNODE_NAME="master-node"
@@ -55,6 +62,9 @@ if (( $EUID == 0 )); then
     cp ${CLONEPATH}/LB3/playbooks/04_workers.yml ~/kube-cluster/hosts 04_workers.yml
     print_log process "disable swap"
     swapoff -a
+
+    # Statt '--extra-vars "ansible_password=${ANSIBLE_USER_PASSWD}"' könnte auch '--ask-pass' genutzt werden
+
     print_log process "run initial playbook"
     ansible-playbook -i hosts ~/kube-cluster/01_initial.yml --extra-vars "ansible_password=${ANSIBLE_USER_PASSWD}"
     print_log process "run kubectl dependencies install"
